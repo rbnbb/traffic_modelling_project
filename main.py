@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from other_functions import lower_diagonal_matrix
 
@@ -7,15 +8,16 @@ from other_functions import lower_diagonal_matrix
     in each cell"""
 #set model size and precision
 
-N = int(10) #number of cells
+N = 5 #number of cells
 dx = 2. #size of a cell in meters
 dt = 2. #time step
 ##set average velocity and density
 v0 = np.array(N * [40e3*60])#initial uniform velocity of 40 km/h given in m/min
-u = np.zeros((200,N)) # N cells with a max time of 200*dt
-v_M = 120e3 * 60 #120 km/h
-rho_M = 1 #2 lane highway and a car is 2 m long
-u[0] = np.array(N * [0.2])
+u = np.zeros((5,N)) # N cells with a max time of 200*dt
+v_M = 120e3 * 60 #120 km/h in m/min
+rho_M = 0.3 #in cars/m
+u[0] = np.array(N * [0])
+u[0][0]=0.2
 #solve equations 
 
 
@@ -36,10 +38,29 @@ def propagate_one_step(u):
     The first 2 terms are the result of a matrix multiplication and the next two
     of a product of the vector u[n] with itself."""
     c = v_M * dt/dx #much used coeff
+    print("c:",c)
     M = np.eye(N) * (1 - c) + lower_diagonal_matrix(N) * c
+    M[0][N-1]=c #due to periodic boundary conditions 
+    print("M:",M)
     u_offset = np.append(u[N-1],u[0:-1])
-    return M@u  +  (2*c/rho_M) * u**2  +  (-2*c/rho_M) * u * u_offset
+    print("u offset:",u_offset,"u*uoff:",u_offset*u,u**2)
+    print("M@u:",M@u)
+    u_result = M@u  +  (2*c/rho_M) * u**2  +  (-2*c/rho_M) * u * u_offset
+    print("u next:",u_result)
+    return u_result
 
-print(u[0],propagate_one_step(u[0]))
+for i in range(1,u.shape[0]):
+    u[i]=propagate_one_step(u[i-1])
+print("\nu matrix:\n",u)
 
 #plot and analyse data
+
+#declare 
+fig, ax = plt.subplots(1,1,figsize=(6,4))
+
+#do a colorbar style plot of density
+data2D = np.random.random((50, 50))
+print(np.transpose(u))
+data_visual = ax.imshow(np.transpose(u), cmap="viridis")
+fig.colorbar(data_visual, ax=ax, location='right')
+plt.show()
