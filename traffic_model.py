@@ -1,3 +1,9 @@
+"""\ traffic_model
+=============
+
+Provides the powerful TrafficModel class for traffic simulations
+based on continuous differential equations.
+"""
 import textwrap
 
 import numpy as np
