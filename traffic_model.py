@@ -6,12 +6,16 @@ Provides the powerful TrafficModel class for traffic simulations
 based on continuous differential equations.
 """
 import textwrap
+import logging
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from other_functions import lower_diagonal_matrix
 
+
+logging.basicConfig(format='%(name)s:%(levelname)s:%(lineno)d:%(message)s')
+logger = logging.getLogger(__name__)
 
 class TrafficModel:
     """\
@@ -27,7 +31,7 @@ class TrafficModel:
             'sin': (lambda x, mu: mu*abs(np.sin(4*np.pi*x))),
             'normal': (lambda x, mu: mu*np.exp(-((x-.5)/.5)**2))}
 
-    def __init__(self, params=None, ic=None, bc="periodic"):
+    def __init__(self, params=None, ic=None, bc="periodic", visual=True):
         if params is None:
             params = {}
         self.__set_params(params)
@@ -35,7 +39,9 @@ class TrafficModel:
         self.u = np.zeros((1, self.params['N']))
         # set initial conditions according to argument
         self.u[0] = self.__initial_conditions(ic)
-        self.__declare_graphical_objects()
+        self.is_visual = visual
+        if visual:
+            self.__declare_graphical_objects()
 
     def propagate_one_step(self, u_in, bc='periodic', rho_in=None):
         """"\
@@ -89,7 +95,8 @@ class TrafficModel:
         for i in range(1, steps):
             u_next[i] = self.propagate_one_step(u_next[i-1])
         self.u = np.vstack((self.u, u_next))
-        self.plot()
+        if self.is_visual:
+            self.plot()
 
     def plot(self):
         """Update TrafficModel class visualisation canvas."""
@@ -169,12 +176,11 @@ class TrafficModel:
         try:
             func = self._all_initial_conditions[ic_type]
         except KeyError:
-            print("Initial conditions type must be among "\
-                  "{_all_initial_conditions.keys()}.\nDefaulting "\
+            logger.error("Initial conditions type must be among "\
+                  f"{self._all_initial_conditions.keys()}. Defaulting "\
                   "to uniform...")
             func = self._all_initial_conditions['uniform']
         m = self.params['rho_M'] * 0.7  # set average rho for ic
         xs = np.linspace(0.01, 1, self.params['N'])
         ic = np.array((lambda x: func(x, m))(xs))
-        print(ic)
         return ic
