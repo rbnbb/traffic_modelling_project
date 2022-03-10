@@ -31,14 +31,14 @@ class TrafficModel:
             'sin': (lambda x, mu: mu*abs(np.sin(4*np.pi*x))),
             'normal': (lambda x, mu: mu*np.exp(-((x-.5)/.5)**2))}
 
-    def __init__(self, params=None, ic=None, bc="periodic", visual=True):
+    def __init__(self, params=None, ic=None, ic_avg=None, bc="periodic", visual=True):
         if params is None:
             params = {}
         self.__set_params(params)
         # define the array rho(x,t) with time the first index
         self.u = np.zeros((1, self.params['N']))
         # set initial conditions according to argument
-        self.u[0] = self.__initial_conditions(ic)
+        self.u[0] = self.__initial_conditions(ic, ic_avg)
         self.is_visual = visual
         if visual:
             self.__declare_graphical_objects()
@@ -88,8 +88,11 @@ class TrafficModel:
         """Returns car flow q(x,t) as per fundamental diagram."""
         return self.params['v_M'] * rho * (1-rho/self.params['rho_M'])
 
-    def run(self, steps=10):
-        """Advance simulation by the requested number of steps."""
+    def run(self, steps=10, time=None):
+        """Advance simulation by the given # of steps or time minutes."""
+        # Should time be provided advance instead by time minutes
+        if time is not None:
+            steps = int(time / self.params['dt'])
         u_next = np.zeros((steps, self.params['N']))
         u_next[0] = self.propagate_one_step(self.u[-1])
         for i in range(1, steps):
@@ -108,7 +111,8 @@ class TrafficModel:
         self.__update_legend()
         self.axd['rho'].set_ylim(0,self.params['N'])
         self.axd['rho'].set_aspect(0.7*self.u.shape[0]/self.u.shape[1])
-        plt.show()
+        plt.draw()
+        plt.show(block=False)
 
     def __declare_graphical_objects(self):
         """Declares a matplotlib fig and ax objects."""
@@ -169,7 +173,7 @@ class TrafficModel:
         dt_max = self.params['dx'] / self.params['v_M']
         assert 0 < self.params['dt'] < dt_max, errmsg
 
-    def __initial_conditions(self, ic_type):
+    def __initial_conditions(self, ic_type, ic_avg):
         """Returns np array of rho(x) at t=0 given string ic_type."""
         if ic_type is None:
             ic_type = 'uniform'
@@ -180,7 +184,11 @@ class TrafficModel:
                   f"{self._all_initial_conditions.keys()}. Defaulting "\
                   "to uniform...")
             func = self._all_initial_conditions['uniform']
-        m = self.params['rho_M'] * 0.7  # set average rho for ic
+        # set average rho halfway by default
+        m =  0.5 * self.params['rho_M']
+        if ic_avg is not None and 0.1<ic_avg<0.9:
+            m = ic_avg * self.params['rho_M']
+
         xs = np.linspace(0.01, 1, self.params['N'])
         ic = np.array((lambda x: func(x, m))(xs))
         return ic
