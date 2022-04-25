@@ -14,9 +14,16 @@ All constructor arguments are optional.
 The notable constructor arguments are:
 
 - params - dictionary containing:
-       - number of chunks N, size in meters of a chunk dx, integration time step in minutes dt, maximum speed in meters/minute v_M and maximum car density in cars/meter rho_M.  Default value is {'N': 200, 'dx': 50., 'dt': 0.02, 'v_M': 120e3 / 60, 'rho_M': 0.3}
+   - number of chunks N, size in meters of a chunk dx
+   - integration time step in minutes dt
+   - maximum speed in meters/minute v_M
+   - maximum car density in cars/meter rho_M.
+   - default values are {'N': 200, 'dx': 50., 'dt': 0.02, 'v_M': 120e3 / 60, 'rho_M': 0.3}
 - ic_avg - average value of car density in cars/meter used for initial conditions
-- ic - specifies the type of initial conditions. It is a string that can take values 'uniform' (same value in all chunks), 'sin' (sinusoidal distribution around average value), 'normal' (normal distribution around average value with centroid in the center chunk)
+- ic - specifies the type of initial conditions. It is a string that can take values:
+   - 'uniform' (same value in all chunks)
+   - 'sin' (sinusoidal distribution around average value)
+   - 'normal' (normal distribution around average value with centroid in the center chunk)
 - bc - boundary conditions type, 'periodic' by default
 
 ### Running the simulation
