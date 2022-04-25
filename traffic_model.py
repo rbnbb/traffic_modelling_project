@@ -34,8 +34,6 @@ import logging
 import numpy as np
 import matplotlib.pyplot as plt
 
-from other_functions import lower_diagonal_matrix
-
 
 logging.basicConfig(format='%(name)s:%(levelname)s:%(lineno)d:%(message)s')
 logger = logging.getLogger(__name__)
@@ -105,7 +103,7 @@ class TrafficModel:
         # define a useful coefficient
         c = self.params['v_M'] * self.params['dt']/self.params['dx']
         M = np.eye(self.params['N']) * (1 - c)\
-            + lower_diagonal_matrix(self.params['N']) * c
+            + self.lower_diagonal_matrix(self.params['N']) * c
         # term to correct for boundary conditions, non 0 for non periodic bc
         bc_correction = np.zeros(self.params['N'])
         if bc == 'periodic':
@@ -150,6 +148,21 @@ class TrafficModel:
         self.axd['rho'].set_ylim(0,self.params['N'])
         self.axd['rho'].set_aspect(0.7*self.u.shape[0]/self.u.shape[1])
         plt.draw()
+
+    def lower_diagonal_matrix(self.n):
+        """Returns a lower diagonal matrix of size n x n.
+
+           For a 3x3 matrix this would look like:
+                            0 0 0
+                            1 0 0
+                            0 1 0
+        """
+        M = np.zeros((n,n))
+        for i in range(n):
+            for j in range(n):
+                if(i-1==j):
+                    M[i][j] = 1
+        return M
 
     def __declare_graphical_objects(self):
         """Declares a matplotlib fig and ax objects."""
