@@ -60,6 +60,6 @@ array([[0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
 ```
 
 ## Technologies
-Python 3
+Python 3.10.4
 
 See [requirements.txt](/requirements.txt) for list of python packages used.
