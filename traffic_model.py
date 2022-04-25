@@ -211,7 +211,8 @@ class TrafficModel:
                           'dt': 0.02,  # time step in min
                           'v_M': 120e3 / 60,  # v_M in m/min
                           'rho_M': 0.3}  # in cars/m
-        self.params = default_params | params
+        self.params = default_params
+        self.params.update(params)
         self.__check_params()
 
     def __check_params(self):
