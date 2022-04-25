@@ -5,7 +5,10 @@ traffic_model
 Provides the powerful TrafficModel class for traffic simulations
 based on continuous differential equations.
 
-Once a simulation is created in a class instance it can be propagated through time using the run method. It can be called by specifying the number of time steps or the time by which to advance the simulation.
+Once a simulation is created in a class instance it can be
+propagated through time using the run method. It can be
+called by specifying the number of time steps or the time by
+which to advance the simulation.
 
 Sample usage:
     >>> import traffic_model as tm  # importing module
@@ -38,6 +41,7 @@ import matplotlib.pyplot as plt
 logging.basicConfig(format='%(name)s:%(levelname)s:%(lineno)d:%(message)s')
 logger = logging.getLogger(__name__)
 
+
 class TrafficModel:
     """\
     Traffic Model
@@ -54,8 +58,10 @@ class TrafficModel:
             * integration time step in minutes dt
             * maximum speed in meters/minute v_M
             * maximum car density in cars/meter rho_M.
-        - ic_avg - average value of car density in cars/meter used for initial conditions
-        - ic - specifies the type of initial conditions. It is a string that can take values:
+        - ic_avg - average value of car density in cars/meter
+          used for initial conditions
+        - ic - specifies the type of initial conditions. It is a
+          string that can take values:
             * 'uniform' (same value in all chunks)
             * 'sin' (sinusoidal distribution around average value)
             * 'normal' (normal distribution around average value)
@@ -67,7 +73,9 @@ class TrafficModel:
             'sin': (lambda x, mu: mu*abs(np.sin(4*np.pi*x))),
             'normal': (lambda x, mu: mu*np.exp(-((x-.5)/.5)**2))}
 
-    def __init__(self, params=None, ic=None, ic_avg=None, bc="periodic", visual=True):
+    def __init__(self, params=None,
+                 ic=None, ic_avg=None,
+                 bc="periodic", visual=True):
         if params is None:
             params = {}
         self.__set_params(params)
@@ -117,7 +125,7 @@ class TrafficModel:
         u_result = M@u_in + c * u_in**2 - c * u_in * u_offset + bc_correction
         assert np.all((u_result > 0)), 'The density should never be negative'
         assert np.all((u_result < self.params['rho_M'])),\
-                'The density should never be bigger than rho_M.'
+            'The density should never be bigger than rho_M.'
         return u_result
 
     def q_car_flow(self, rho):
@@ -145,7 +153,7 @@ class TrafficModel:
                           cax=self.axd['rho_cb'],
                           label="$\\rho(x,t)$ value")
         self.__update_legend()
-        self.axd['rho'].set_ylim(0,self.params['N'])
+        self.axd['rho'].set_ylim(0, self.params['N'])
         self.axd['rho'].set_aspect(0.7*self.u.shape[0]/self.u.shape[1])
         plt.draw()
 
@@ -157,10 +165,10 @@ class TrafficModel:
                             1 0 0
                             0 1 0
         """
-        M = np.zeros((n,n))
+        M = np.zeros((n, n))
         for i in range(n):
             for j in range(n):
-                if(i-1==j):
+                if(i-1 == j):
                     M[i][j] = 1
         return M
 
@@ -230,13 +238,13 @@ class TrafficModel:
         try:
             func = self._all_initial_conditions[ic_type]
         except KeyError:
-            logger.error("Initial conditions type must be among "\
-                  f"{self._all_initial_conditions.keys()}. Defaulting "\
-                  "to uniform...")
+            logger.error("Initial conditions type must be among "
+                         f"{self._all_initial_conditions.keys()}. Defaulting "
+                         "to uniform...")
             func = self._all_initial_conditions['uniform']
         # set average rho halfway by default
-        m =  0.5 * self.params['rho_M']
-        if ic_avg is not None and 0.1<ic_avg<0.9:
+        m = 0.5 * self.params['rho_M']
+        if ic_avg is not None and 0.1 < ic_avg < 0.9:
             m = ic_avg * self.params['rho_M']
 
         xs = np.linspace(0.01, 1, self.params['N'])
