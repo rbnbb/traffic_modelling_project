@@ -62,4 +62,4 @@ array([[0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
 ## Technologies
 Python 3
 
-See requierments.txt for list of python packages used.
+See [requierments.txt](/requierments.txt) for list of python packages used.
