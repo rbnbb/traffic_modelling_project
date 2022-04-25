@@ -149,7 +149,7 @@ class TrafficModel:
         self.axd['rho'].set_aspect(0.7*self.u.shape[0]/self.u.shape[1])
         plt.draw()
 
-    def lower_diagonal_matrix(self.n):
+    def lower_diagonal_matrix(self, n):
         """Returns a lower diagonal matrix of size n x n.
 
            For a 3x3 matrix this would look like:
