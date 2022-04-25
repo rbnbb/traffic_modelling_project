@@ -4,6 +4,29 @@ traffic_model
 
 Provides the powerful TrafficModel class for traffic simulations
 based on continuous differential equations.
+
+Once a simulation is created in a class instance it can be propagated through time using the run method. It can be called by specifying the number of time steps or the time by which to advance the simulation.
+
+Sample usage:
+    >>> import traffic_model as tm  # importing module
+    >>> m = tm.TrafficModel()  # creating class instance
+    >>> print(m.params)  # view default parameters
+    {'N': 200, 'dx': 50.0, 'dt': 0.02, 'v_M': 2000.0, 'rho_M': 0.3}
+    >>> m.run(10)  # advancing simulation by 10 steps
+    >>> m.u  # car density array
+    array([[0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
+           [0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
+           [0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
+           ...,
+           [0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
+           [0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
+           [0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15]])
+    >>> m.u.shape  # size of the car density matrix
+    (11, 200)
+    >>> m.run(time=20)  # advancing simulation by 20 minutes
+    >>> m.u.shape
+    (1011, 200)
+    >>> m.fig.savefig("sample.png")  # save default visualisation as png image
 """
 import textwrap
 import logging
@@ -22,8 +45,23 @@ class TrafficModel:
     Traffic Model
     ============
 
-    Class representing an instance of a road simulation with initial
-    all initial conditions and assumptions.
+    Class representing an instance of a road simulation with
+    initial conditions and assumptions as constructor arguments.
+
+    All constructor arguments are optional.
+    The notable constructor arguments are:
+        - params - dictionary containing
+            * number of chunks N
+            * size in meters of a chunk dx
+            * integration time step in minutes dt
+            * maximum speed in meters/minute v_M
+            * maximum car density in cars/meter rho_M.
+        - ic_avg - average value of car density in cars/meter used for initial conditions
+        - ic - specifies the type of initial conditions. It is a string that can take values:
+            * 'uniform' (same value in all chunks)
+            * 'sin' (sinusoidal distribution around average value)
+            * 'normal' (normal distribution around average value)
+        - bc - boundary conditions type, 'periodic' by default
     """
 
     _all_initial_conditions = {
@@ -112,7 +150,6 @@ class TrafficModel:
         self.axd['rho'].set_ylim(0,self.params['N'])
         self.axd['rho'].set_aspect(0.7*self.u.shape[0]/self.u.shape[1])
         plt.draw()
-        plt.show(block=False)
 
     def __declare_graphical_objects(self):
         """Declares a matplotlib fig and ax objects."""
