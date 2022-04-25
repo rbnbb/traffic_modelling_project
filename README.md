@@ -8,7 +8,7 @@ Before direct usage running the [tests](/tests.py) and ensuring they are all pas
 
 The code can be used by importing the traffic_model module and creating an instance of the TrafficModel class.
 
-### Calling the constructor
+#### Calling the constructor
 All constructor arguments are optional.
 
 The notable constructor arguments are:
@@ -26,10 +26,10 @@ The notable constructor arguments are:
    - 'normal' (normal distribution around average value with centroid in the center chunk)
 - bc - boundary conditions type, 'periodic' by default
 
-### Running the simulation
+#### Running the simulation
 Once a simulation is created in a class instance it can be propagated through time using the run method. It can be called by specifying the number of time steps or the time duration (in minutes) by which to advance the simulation.
 
-### Exploiting the results
+#### Exploiting the results
 A default visualisation method is included in the class and it can be accessed via the member fig which is a matplotlib figure.
 
 For other needs, the car density in all chunks at all times can be found in the class member u which is a 2D numpy array. One can access it and save it to a file and/or do a different visualisation.
@@ -60,5 +60,8 @@ array([[0.15, 0.15, 0.15, ..., 0.15, 0.15, 0.15],
 ```
 
 ## Technologies
-Python 3
-See requierments.txt for list of python packages used.
+Python 3.10.4
+
+Uses modules numpy, matplotlib and hypothesis. The last one is only used in [testing](/tests.py) .
+
+See [requirements.txt](/requirements.txt) for list of python packages with versions used.
